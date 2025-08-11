@@ -1,5 +1,4 @@
 region                      = "us-east-1"
-zone_name                   = "jetolink.com"
 account_numbers             = [159773342471]
 aws_ram_resource_share_name = "shared-network-resources"
 

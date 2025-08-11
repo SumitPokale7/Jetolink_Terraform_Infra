@@ -11,7 +11,7 @@ module "vpc" {
   name                          = "${var.vpc_name}-${terraform.workspace}"
   tags = merge(
     {
-      Name = "Central-VPC-${terraform.workspace}",
+      Name         = "Central-VPC-${terraform.workspace}",
       Environement = terraform.workspace
     },
     var.tags
@@ -40,7 +40,7 @@ resource "aws_security_group" "vpc_sg" {
 
   tags = merge(
     {
-      Name = "VPC-SG-${terraform.workspace}",
+      Name         = "VPC-SG-${terraform.workspace}",
       Environement = terraform.workspace
     },
     var.tags

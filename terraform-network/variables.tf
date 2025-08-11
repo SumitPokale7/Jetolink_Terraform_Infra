@@ -46,10 +46,6 @@ variable "account_numbers" {
   type = set(string)
 }
 
-variable "zone_name" {
-  type = string
-}
-
 variable "tags" {
   default = {
     SharedBy  = "mgmt"

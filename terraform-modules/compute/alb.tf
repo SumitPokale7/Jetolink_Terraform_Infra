@@ -50,7 +50,7 @@ resource "aws_lb_listener" "https_listener" {
   certificate_arn   = var.acm_certificate
 
   default_action {
-    type             = "forward"
+    type = "forward"
     target_group_arn = module.alb.target_group_arns[
       index(module.alb.target_group_names, "jetolink-frontend-${terraform.workspace}")
     ]
@@ -66,7 +66,7 @@ resource "aws_lb_listener" "http_listener" {
   load_balancer_arn = module.alb.lb_arn
 
   default_action {
-    type             = "forward"
+    type = "forward"
     target_group_arn = module.alb.target_group_arns[
       index(module.alb.target_group_names, "jetolink-frontend-${terraform.workspace}")
     ]
@@ -87,7 +87,7 @@ resource "aws_lb_listener_rule" "https_host_header_rule" {
   }
 
   action {
-    type             = "forward"
+    type = "forward"
     target_group_arn = module.alb.target_group_arns[
       index(module.alb.target_group_names, "jetolink-frontend-${terraform.workspace}")
     ]
@@ -111,7 +111,7 @@ resource "aws_lb_listener_rule" "https_service_rules" {
   }
 
   action {
-    type             = "forward"
+    type = "forward"
     target_group_arn = element(
       module.alb.target_group_arns,
       index(keys(var.ecs_services), each.key)
@@ -136,7 +136,7 @@ resource "aws_lb_listener_rule" "http_service_rules" {
   }
 
   action {
-    type             = "forward"
+    type = "forward"
     target_group_arn = element(
       module.alb.target_group_arns,
       index(keys(var.ecs_services), each.key)

@@ -34,7 +34,7 @@ terraform {
   required_providers {
     aws = {
       version               = "~> 5.0"
-      configuration_aliases = [aws.mgmt]  # Used for cross-account rule attachment
+      configuration_aliases = [aws.mgmt] # Used for cross-account rule attachment
       source                = "hashicorp/aws"
     }
   }
@@ -42,13 +42,13 @@ terraform {
 
 # Creates a security group rule in the "mgmt" account to allow Bastion SG to access PostgreSQL DB port
 resource "aws_security_group_rule" "allow_bastion_to_rds" {
-  provider = aws.mgmt  # Uses the aliased provider for target account
+  provider = aws.mgmt # Uses the aliased provider for target account
 
   from_port                = 5432
   to_port                  = 5432
   protocol                 = "tcp"
   type                     = "ingress"
-  source_security_group_id = aws_security_group.bastion_sg.id  # Bastion SG as the source
-  security_group_id        = tolist(var.default_security_group_id)[0]  # RDS SG as the target
+  source_security_group_id = aws_security_group.bastion_sg.id         # Bastion SG as the source
+  security_group_id        = tolist(var.default_security_group_id)[0] # RDS SG as the target
   description              = "Allow Bastion host to connect to Aurora PostgreSQL"
 }

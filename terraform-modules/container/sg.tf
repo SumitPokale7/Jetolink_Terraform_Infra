@@ -13,7 +13,7 @@ resource "aws_security_group" "allow_traffic_to_container" {
     ]))
     content {
       protocol        = "tcp"
-      security_groups = [var.alb_sg]  # ALB SG as the source
+      security_groups = [var.alb_sg] # ALB SG as the source
       from_port       = ingress.value
       to_port         = ingress.value
     }

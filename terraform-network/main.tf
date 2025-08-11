@@ -50,5 +50,5 @@ resource "aws_ram_resource_association" "public_subnets" {
 # Share security_group
 resource "aws_ram_resource_association" "vpc_security_group" {
   resource_share_arn = aws_ram_resource_share.network_share.arn
-  resource_arn       = "arn:aws:ec2:${var.region}:${data.aws_caller_identity.this.account_id}:security-group/${module.network.vpc_security_group_id}" 
+  resource_arn       = "arn:aws:ec2:${var.region}:${data.aws_caller_identity.this.account_id}:security-group/${module.network.vpc_security_group_id}"
 }

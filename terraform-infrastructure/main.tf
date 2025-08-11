@@ -118,12 +118,12 @@ module "cloudwatch_dashboards" {
   for_each = var.ecs_services
   source   = "../terraform-modules/cloudwatch-dashboard"
 
-  region                    = var.region
-  alb_name                  = module.compute.alb_name
-  alb_id                    = module.compute.lb_arn_suffix
-  ecs_cluster_name          = module.container.cluster_name
-  ecs_service_name          = "${each.key}-${terraform.workspace}"
-  dashboard_name            = "${each.key}-${terraform.workspace}-dashboard"
+  region           = var.region
+  alb_name         = module.compute.alb_name
+  alb_id           = module.compute.lb_arn_suffix
+  ecs_cluster_name = module.container.cluster_name
+  ecs_service_name = "${each.key}-${terraform.workspace}"
+  dashboard_name   = "${each.key}-${terraform.workspace}-dashboard"
 
   depends_on = [
     module.container,

@@ -106,7 +106,7 @@ resource "aws_instance" "bastion" {
   EOF
 
   lifecycle {
-    ignore_changes = [ 
+    ignore_changes = [
       associate_public_ip_address
     ]
   }

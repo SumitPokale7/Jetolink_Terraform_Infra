@@ -21,6 +21,7 @@ resource "aws_acm_certificate" "certificate" {
     create_before_destroy = true
     prevent_destroy       = true
   }
+
   tags = merge(
     {
       Environment = terraform.workspace
@@ -57,9 +58,10 @@ resource "aws_acm_certificate_validation" "validate" {
     for record in aws_route53_record.cert_validation : record.fqdn
   ]
 
-  depends_on = [aws_route53_record.cert_validation]
   lifecycle {
     prevent_destroy = true
     ignore_changes  = [validation_record_fqdns]
   }
+
+  depends_on = [aws_route53_record.cert_validation]
 }

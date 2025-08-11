@@ -52,13 +52,13 @@ resource "aws_ecs_task_definition" "this" {
 
   container_definitions = jsonencode([
     {
-      name         = "${each.key}-${terraform.workspace}"
-      image        = "${aws_ecr_repository.jetolink_ecr_repos[each.key].repository_url}:latest"
-      portMappings = each.value.portMappings
-      secrets      = each.value.secrets
-      environment  = each.value.environment
-      mountPoints  = []
-      volumesFrom  = []
+      name           = "${each.key}-${terraform.workspace}"
+      image          = "${aws_ecr_repository.jetolink_ecr_repos[each.key].repository_url}:latest"
+      portMappings   = each.value.portMappings
+      secrets        = each.value.secrets
+      environment    = each.value.environment
+      mountPoints    = []
+      volumesFrom    = []
       systemControls = []
 
       logConfiguration = {

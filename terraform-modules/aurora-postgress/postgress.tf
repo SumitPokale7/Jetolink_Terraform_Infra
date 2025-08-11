@@ -46,11 +46,11 @@ resource "aws_rds_cluster" "this" {
   skip_final_snapshot       = var.skip_final_snapshot
   final_snapshot_identifier = "final-snapshot-${terraform.workspace}-${formatdate("YYYYMMDDhhmmss", timestamp())}"
 
-  backup_retention_period   = var.backup_retention_period
-  preferred_backup_window   = var.preferred_backup_window
+  backup_retention_period = var.backup_retention_period
+  preferred_backup_window = var.preferred_backup_window
 
-  db_subnet_group_name      = aws_db_subnet_group.this.name
-  vpc_security_group_ids    = [aws_security_group.rds_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.this.name
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
 
   # Only attach global cluster in production
   global_cluster_identifier = terraform.workspace == "prod" ? aws_rds_global_cluster.this[0].id : null
@@ -144,5 +144,5 @@ resource "aws_ec2_instance_state" "change_to_stop" {
   state       = "stopped"
   instance_id = aws_instance.bastion.id
 
-  depends_on = [ null_resource.create_databases ]
+  depends_on = [null_resource.create_databases]
 }
