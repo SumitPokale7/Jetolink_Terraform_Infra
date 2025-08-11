@@ -1,0 +1,71 @@
+version: 0.2
+
+env:
+  variables:
+    TF_VERSION: "1.12.2"
+    AWS_REGION: "us-east-1"
+    TF_NETWORK_DIR: "terraform-network"
+    TF_GLOBAL_RESOURCES_DIR: "terraform-global-resources"
+    TF_INFRA_DIR: "terraform-infrastructure"
+    MGMT_ROLE_ARN: arn:aws:iam::777446362975:role/TerraformAccessRole
+
+phases:
+  install:
+    commands:
+      - cd /usr/bin
+      - apt-get update && apt-get install -y unzip curl
+      - curl -s -qL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+      - unzip -o terraform.zip && rm terraform.zip
+      - terraform --version
+
+  pre_build:
+    commands:
+      - echo "#### STS AssumeRole into Mgmt Account (Networking)"
+      - >
+        MGMT_CREDS=$(aws sts assume-role \
+          --role-arn $MGMT_ROLE_ARN \
+          --role-session-name "codebuild-mgmt-session")
+      - export AWS_ACCESS_KEY_ID=$(echo $MGMT_CREDS | jq -r .Credentials.AccessKeyId)
+      - export AWS_SECRET_ACCESS_KEY=$(echo $MGMT_CREDS | jq -r .Credentials.SecretAccessKey)
+      - export AWS_SESSION_TOKEN=$(echo $MGMT_CREDS | jq -r .Credentials.SessionToken)
+
+      - echo "#### Running Terraform for Networking in Mgmt Account"
+      - cd $CODEBUILD_SRC_DIR/$TF_NETWORK_DIR
+      - terraform init -backend-config="mgmt.s3.tfbackend" -reconfigure -no-color
+      - terraform workspace select dev || terraform workspace new dev
+      - terraform validate
+      - terraform plan -var-file='tfvars/dev_mgmt.tfvars'
+      - terraform apply -var-file='tfvars/dev_mgmt.tfvars' --auto-approve
+
+      - echo "#### Unsetting Mgmt Temporary Credentials"
+      - unset AWS_ACCESS_KEY_ID
+      - unset AWS_SECRET_ACCESS_KEY
+      - unset AWS_SESSION_TOKEN
+
+      - echo "#### Running Terraform Init for global resources in Dev Account"
+      - cd $CODEBUILD_SRC_DIR/$TF_GLOBAL_RESOURCES_DIR
+      - ./apply_tf.sh dev
+
+      - echo "#### Running Terraform Init for Infra in Dev Account"
+      - cd $CODEBUILD_SRC_DIR/$TF_INFRA_DIR
+      - terraform init -backend-config="mgmt.s3.tfbackend" -reconfigure -no-color
+      - terraform workspace select dev || terraform workspace new dev
+      - terraform validate
+
+  build:
+    commands:
+      - echo "#### Running Terraform Plan & Apply for Infra in Dev Account"
+      - cd $CODEBUILD_SRC_DIR/$TF_INFRA_DIR
+      - terraform plan -var-file='tfvars/dev.tfvars' -out=tfplan_commitid_${CODEBUILD_RESOLVED_SOURCE_VERSION}_buildnumber_${CODEBUILD_BUILD_NUMBER}
+      - terraform apply --auto-approve tfplan_commitid_${CODEBUILD_RESOLVED_SOURCE_VERSION}_buildnumber_${CODEBUILD_BUILD_NUMBER}
+
+  post_build:
+    commands:
+      - echo "#### Saving Plan Output"
+      - cp tfplan_commitid_${CODEBUILD_RESOLVED_SOURCE_VERSION}_buildnumber_${CODEBUILD_BUILD_NUMBER} ${CODEBUILD_SRC_DIR}/
+      - echo "Build completed at $(date)"
+
+artifacts:
+  files:
+    - tfplan_commitid_*
+  name: TerraformPlanFile

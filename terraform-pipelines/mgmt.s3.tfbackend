@@ -1,0 +1,3 @@
+region         = "us-east-1"
+bucket         = "jetolink-mgmt-terraform-state"
+dynamodb_table = "jetolink-mgmt-terraform-lock-table"
